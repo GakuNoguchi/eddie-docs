@@ -1,0 +1,17 @@
+{
+  "name": "eddie-docs",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "eddie-docs documentation powered by Eddie",
+  "scripts": {
+    "dev": "vitepress dev edit/4.publish📚",
+    "build": "vitepress build edit/4.publish📚",
+    "preview": "vitepress preview edit/4.publish📚",
+    "search": "eddie-search",
+    "reindex": "eddie-reindex"
+  },
+  "dependencies": {
+    "eddie-vector-search": "^1.0.0",
+    "vitepress": "^1.0.0"
+  }
+}

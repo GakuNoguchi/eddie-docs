@@ -1,0 +1,5 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "edit/4.publish📚/.vitepress/dist",
+  "framework": null
+}

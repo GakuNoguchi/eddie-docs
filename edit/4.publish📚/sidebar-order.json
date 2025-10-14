@@ -1,0 +1,26 @@
+{
+  "groups": [
+    {
+      "text": "Getting Started",
+      "items": [
+        { "file": "index", "text": "Introduction" },
+        { "file": "installation", "text": "Installation" },
+        { "file": "getting-started", "text": "Getting Started" }
+      ]
+    },
+    {
+      "text": "Guide",
+      "items": [
+        { "file": "workflow", "text": "Workflow" },
+        { "file": "vector-search", "text": "Vector Search" },
+        { "file": "claude-code-hooks", "text": "Claude Code Hooks" }
+      ]
+    },
+    {
+      "text": "Deployment",
+      "items": [
+        { "file": "deployment", "text": "Deploy to Vercel" }
+      ]
+    }
+  ]
+}

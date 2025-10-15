@@ -141,7 +141,16 @@ export default {
             console.log('Markdown length:', markdown.length)
             console.log('First 100 chars:', markdown.substring(0, 100))
 
-            const baseName = mdPath.split('/').pop().replace('.md', '')
+            // Extract title from markdown (first # heading) or fall back to path-based name
+            let baseName = mdPath.split('/').pop().replace('.md', '')
+            const titleMatch = markdown.match(/^#\s+(.+)$/m)
+            if (titleMatch) {
+              baseName = titleMatch[1].trim()
+                .replace(/[^a-zA-Z0-9\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF\s-]/g, '') // Remove special chars
+                .replace(/\s+/g, '-') // Replace spaces with hyphens
+                .toLowerCase()
+              console.log('📝 Extracted title from markdown:', titleMatch[1])
+            }
             console.log('Base filename:', baseName)
 
             if (format === 'md') {

@@ -3102,7 +3102,7 @@ const _sfc_main$s = /* @__PURE__ */ defineComponent({
   __name: "VPNavBarSearch",
   __ssrInlineRender: true,
   setup(__props) {
-    const VPLocalSearchBox = defineAsyncComponent(() => import("./VPLocalSearchBox.DgERtCr4.js"));
+    const VPLocalSearchBox = defineAsyncComponent(() => import("./VPLocalSearchBox.oFi8eeTU.js"));
     const VPAlgoliaSearchBox = () => null;
     const { theme: theme2 } = useData();
     const loaded = ref(false);
@@ -4855,6 +4855,9 @@ const RawTheme = {
           <span class="download-text">Download</span>
         `;
         btn.onclick = async () => {
+          console.log("📥 Download button clicked");
+          console.log("Current URL:", window.location.href);
+          console.log("Pathname:", window.location.pathname);
           const menu = document.createElement("div");
           menu.className = "download-menu";
           menu.innerHTML = `
@@ -4900,39 +4903,65 @@ const RawTheme = {
             item.onclick = async () => {
               menu.remove();
               const action = item.dataset.action;
+              console.log("🔽 Menu item clicked:", action);
               if (action === "current-md") {
+                console.log("🔽 Starting Markdown download");
                 await downloadCurrentPage("md");
               } else if (action === "current-pdf") {
+                console.log("🔽 Starting PDF download");
                 await downloadCurrentPage("pdf");
               } else if (action === "current-docx") {
+                console.log("🔽 Starting Word download");
                 await downloadCurrentPage("docx");
               } else if (action === "all") {
+                console.log("🔽 Starting ZIP download (all pages)");
                 await downloadAllPages();
               }
             };
           });
         };
         async function downloadCurrentPage(format = "md") {
+          console.log(`📄 downloadCurrentPage called with format: ${format}`);
           try {
             const path = window.location.pathname;
+            console.log("Current path:", path);
             let mdPath = path.replace(/\.html$/, ".md");
             if (mdPath.endsWith("/")) {
               mdPath = mdPath + "index.md";
             }
+            console.log("Converted mdPath:", mdPath);
+            console.log("About to fetch:", mdPath);
             const response = await fetch(mdPath);
-            if (!response.ok) throw new Error("File not found");
+            console.log("Fetch response status:", response.status);
+            console.log("Fetch response ok:", response.ok);
+            console.log("Fetch response URL:", response.url);
+            if (!response.ok) {
+              console.error("❌ Fetch failed:", response.status, response.statusText);
+              throw new Error("File not found");
+            }
             const markdown = await response.text();
+            console.log("✅ Markdown fetched successfully");
+            console.log("Markdown length:", markdown.length);
+            console.log("First 100 chars:", markdown.substring(0, 100));
             const baseName = mdPath.split("/").pop().replace(".md", "");
+            console.log("Base filename:", baseName);
             if (format === "md") {
+              console.log("💾 Creating Markdown blob");
               const blob = new Blob([markdown], { type: "text/markdown" });
               downloadFile(blob, `${baseName}.md`);
+              console.log("✅ Markdown download triggered");
             } else if (format === "pdf") {
+              console.log("📑 Starting PDF generation");
               await downloadAsPDF(markdown, baseName);
             } else if (format === "docx") {
+              console.log("📘 Starting Word generation");
               await downloadAsWord(markdown, baseName);
             }
           } catch (error) {
-            console.error("Download failed:", error);
+            console.error("❌ Download failed:", error);
+            console.error("Error name:", error.name);
+            console.error("Error message:", error.message);
+            console.error("Error stack:", error.stack);
             alert("ダウンロードに失敗しました");
           }
         }
@@ -4945,85 +4974,141 @@ const RawTheme = {
           URL.revokeObjectURL(url);
         }
         async function downloadAsPDF(markdown, filename) {
+          console.log("📑 downloadAsPDF called");
+          console.log("Markdown length:", markdown.length);
+          console.log("Filename:", filename);
           try {
             if (!window.html2pdf) {
+              console.log("⬇️ Loading html2pdf library...");
               await loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js");
+              console.log("✅ html2pdf loaded");
+            } else {
+              console.log("✅ html2pdf already loaded");
             }
+            console.log("🔄 Converting markdown to HTML");
             const htmlContent = markdown.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n\n/g, "<br><br>").replace(/\n/g, "<br>");
+            console.log("HTML content length:", htmlContent.length);
             const element = document.createElement("div");
             element.innerHTML = htmlContent;
             element.style.padding = "20px";
             element.style.fontFamily = "Arial, sans-serif";
             element.style.fontSize = "12px";
             element.style.lineHeight = "1.6";
+            console.log("🖨️ Generating PDF...");
             await window.html2pdf().from(element).save(`${filename}.pdf`);
+            console.log("✅ PDF saved:", `${filename}.pdf`);
           } catch (error) {
-            console.error("PDF generation failed:", error);
+            console.error("❌ PDF generation failed:", error);
+            console.error("Error stack:", error.stack);
             alert("PDF generation failed. Please try downloading as Markdown instead.");
           }
         }
         async function downloadAsWord(markdown, filename) {
-          if (!window.docx) {
-            await loadScript("https://unpkg.com/docx@8.5.0/build/index.js");
+          console.log("📘 downloadAsWord called");
+          console.log("Markdown length:", markdown.length);
+          console.log("Filename:", filename);
+          try {
+            if (!window.docx) {
+              console.log("⬇️ Loading docx library...");
+              await loadScript("https://unpkg.com/docx@8.5.0/build/index.js");
+              console.log("✅ docx loaded");
+            } else {
+              console.log("✅ docx already loaded");
+            }
+            console.log("📦 Extracting docx classes");
+            const { Document, Packer, Paragraph, TextRun } = window.docx;
+            console.log("Document type:", typeof Document);
+            console.log("Packer type:", typeof Packer);
+            console.log("Paragraph type:", typeof Paragraph);
+            console.log("TextRun type:", typeof TextRun);
+            console.log("🔄 Converting markdown to paragraphs");
+            const paragraphs = markdown.split("\n\n").map(
+              (text) => new Paragraph({
+                children: [new TextRun(text)]
+              })
+            );
+            console.log("Paragraph count:", paragraphs.length);
+            console.log("📝 Creating document");
+            const doc = new Document({
+              sections: [{ children: paragraphs }]
+            });
+            console.log("💾 Packing to blob");
+            const blob = await Packer.toBlob(doc);
+            console.log("Blob size:", blob.size);
+            downloadFile(blob, `${filename}.docx`);
+            console.log("✅ Word saved:", `${filename}.docx`);
+          } catch (error) {
+            console.error("❌ Word generation failed:", error);
+            console.error("Error stack:", error.stack);
+            alert("Word generation failed. Please try downloading as Markdown instead.");
           }
-          const { Document, Packer, Paragraph, TextRun } = window.docx;
-          const paragraphs = markdown.split("\n\n").map(
-            (text) => new Paragraph({
-              children: [new TextRun(text)]
-            })
-          );
-          const doc = new Document({
-            sections: [{ children: paragraphs }]
-          });
-          const blob = await Packer.toBlob(doc);
-          downloadFile(blob, `${filename}.docx`);
         }
         function loadScript(src) {
+          console.log("📥 loadScript:", src);
           return new Promise((resolve, reject) => {
             const script = document.createElement("script");
             script.src = src;
-            script.onload = resolve;
-            script.onerror = reject;
+            script.onload = () => {
+              console.log("✅ Script loaded successfully:", src);
+              resolve();
+            };
+            script.onerror = (error) => {
+              console.error("❌ Script load failed:", src, error);
+              reject(error);
+            };
             document.head.appendChild(script);
           });
         }
         async function downloadAllPages() {
+          console.log("📦 downloadAllPages called");
           try {
             if (!window.JSZip) {
-              await new Promise((resolve, reject) => {
-                const script = document.createElement("script");
-                script.src = "https://cdn.jsdelivr.net/npm/jszip@3/dist/jszip.min.js";
-                script.onload = resolve;
-                script.onerror = reject;
-                document.head.appendChild(script);
-              });
+              console.log("⬇️ Loading JSZip library...");
+              await loadScript("https://cdn.jsdelivr.net/npm/jszip@3/dist/jszip.min.js");
+              console.log("✅ JSZip loaded");
+            } else {
+              console.log("✅ JSZip already loaded");
             }
             const zip = new window.JSZip();
+            console.log("📦 ZIP instance created");
             const links = Array.from(document.querySelectorAll(".VPSidebar a")).map((a2) => a2.getAttribute("href")).filter((href) => href && !href.startsWith("http")).map((href) => href.endsWith("/") ? href + "index.md" : href + ".md");
+            console.log("Found sidebar links:", links.length);
+            console.log("Links:", links);
             const currentPath = window.location.pathname;
             const currentMd = currentPath.endsWith("/") ? currentPath + "index.md" : currentPath + ".md";
             if (!links.includes(currentMd)) {
               links.push(currentMd);
+              console.log("Added current page:", currentMd);
             }
+            console.log("Total links to fetch:", links.length);
             let successCount = 0;
             for (const mdPath of links) {
               try {
+                console.log(`Fetching: ${mdPath}`);
                 const response = await fetch(mdPath);
+                console.log(`Response for ${mdPath}: ${response.status}`);
                 if (response.ok) {
                   const content = await response.text();
                   const fileName = mdPath.replace(/^\//, "").replace(/\//g, "_");
                   zip.file(fileName, content);
                   successCount++;
+                  console.log(`✅ Added to ZIP: ${fileName}`);
+                } else {
+                  console.warn(`❌ Failed to fetch ${mdPath}: ${response.status}`);
                 }
               } catch (e) {
-                console.warn(`Failed to fetch ${mdPath}:`, e);
+                console.warn(`❌ Exception fetching ${mdPath}:`, e);
               }
             }
+            console.log(`Total files successfully fetched: ${successCount}/${links.length}`);
             if (successCount === 0) {
+              console.error("❌ No files could be downloaded");
               alert("ダウンロード可能なファイルが見つかりませんでした");
               return;
             }
+            console.log("📦 Generating ZIP file...");
             const zipBlob = await zip.generateAsync({ type: "blob" });
+            console.log("ZIP blob size:", zipBlob.size);
             const url = URL.createObjectURL(zipBlob);
             const a = document.createElement("a");
             a.href = url;
@@ -5032,7 +5117,8 @@ const RawTheme = {
             URL.revokeObjectURL(url);
             console.log(`✅ Downloaded ${successCount} files as ZIP`);
           } catch (error) {
-            console.error("ZIP download failed:", error);
+            console.error("❌ ZIP download failed:", error);
+            console.error("Error stack:", error.stack);
             alert("ZIPダウンロードに失敗しました");
           }
         }

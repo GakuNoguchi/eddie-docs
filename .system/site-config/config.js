@@ -125,5 +125,31 @@ export default defineConfig({
     // Load mermaid from CDN
     ['script', { src: 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js' }],
     ['script', {}, 'mermaid.initialize({ startOnLoad: true });']
-  ]
+  ],
+
+  // Copy Markdown files to dist for download feature
+  buildEnd: async (siteConfig) => {
+    console.log('🔧 buildEnd hook: Copying Markdown files to dist...')
+
+    // Get the source directory (edit/4.publish📚)
+    const srcDir = path.resolve(__dirname, '../../edit/4.publish📚')
+    const outDir = siteConfig.outDir
+
+    console.log('Source directory:', srcDir)
+    console.log('Output directory:', outDir)
+
+    // Find all .md files in the source directory (not recursive)
+    const mdFiles = fs.readdirSync(srcDir).filter(f => f.endsWith('.md'))
+    console.log('Found Markdown files:', mdFiles.length)
+
+    // Copy each .md file to dist
+    for (const file of mdFiles) {
+      const srcPath = path.join(srcDir, file)
+      const destPath = path.join(outDir, file)
+      fs.copyFileSync(srcPath, destPath)
+      console.log(`  ✅ Copied: ${file}`)
+    }
+
+    console.log(`✅ Copied ${mdFiles.length} Markdown files to dist/`)
+  }
 })

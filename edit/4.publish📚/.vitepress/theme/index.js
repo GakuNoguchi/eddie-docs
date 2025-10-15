@@ -235,10 +235,10 @@ export default {
           console.log('Filename:', filename)
 
           try {
-            // Load docx from CDN (browser bundle)
+            // Load docx from CDN (browser bundle - jsDelivr)
             if (!window.docx) {
               console.log('⬇️ Loading docx library...')
-              await loadScript('https://unpkg.com/docx@8.5.0/build/index.js')
+              await loadScript('https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js')
               console.log('✅ docx loaded')
             } else {
               console.log('✅ docx already loaded')

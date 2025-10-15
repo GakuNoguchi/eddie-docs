@@ -308,7 +308,16 @@ export default {
             const links = Array.from(document.querySelectorAll('.VPSidebar a'))
               .map(a => a.getAttribute('href'))
               .filter(href => href && !href.startsWith('http'))
-              .map(href => href.endsWith('/') ? href + 'index.md' : href + '.md')
+              .map(href => {
+                // Convert .html to .md (replace, not append)
+                if (href.endsWith('.html')) {
+                  return href.replace(/\.html$/, '.md')
+                } else if (href.endsWith('/')) {
+                  return href + 'index.md'
+                } else {
+                  return href + '.md'
+                }
+              })
 
             console.log('Found sidebar links:', links.length)
             console.log('Links:', links)

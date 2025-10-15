@@ -17,7 +17,7 @@ export default defineConfig({
   title: 'eddie-docs',
   description: 'Documentation powered by Eddie',
 
-  appearance: 'light', // Force light mode
+  appearance: false, // Disable dark mode completely
   ignoreDeadLinks: true,
 
   markdown: {

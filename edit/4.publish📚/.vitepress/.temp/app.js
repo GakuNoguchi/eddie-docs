@@ -30,7 +30,7 @@ _sfc_main$14.setup = (props, ctx) => {
 function deserializeFunctions(r) {
   return Array.isArray(r) ? r.map(deserializeFunctions) : typeof r == "object" && r !== null ? Object.keys(r).reduce((t, n) => (t[n] = deserializeFunctions(r[n]), t), {}) : typeof r == "string" && r.startsWith("_vp-fn_") ? new Function(`return ${r.slice(7)}`)() : r;
 }
-const siteData = deserializeFunctions(JSON.parse('{"lang":"en-US","dir":"ltr","title":"eddie-docs","description":"Documentation powered by Eddie","base":"/","head":[],"router":{"prefetchLinks":true},"appearance":"light","themeConfig":{"sidebar":[{"text":"Getting Started","items":[{"text":"Introduction","link":"/"},{"text":"Installation","link":"/installation"},{"text":"Getting Started","link":"/getting-started"}]},{"text":"Guide","items":[{"text":"Workflow","link":"/workflow"},{"text":"Vector Search","link":"/vector-search"},{"text":"Claude Code Hooks","link":"/claude-code-hooks"}]},{"text":"Deployment","items":[{"text":"Deploy to Vercel","link":"/deployment"}]}],"search":{"provider":"local"}},"locales":{},"scrollOffset":134,"cleanUrls":false}'));
+const siteData = deserializeFunctions(JSON.parse('{"lang":"en-US","dir":"ltr","title":"eddie-docs","description":"Documentation powered by Eddie","base":"/","head":[],"router":{"prefetchLinks":true},"appearance":false,"themeConfig":{"sidebar":[{"text":"Getting Started","items":[{"text":"Introduction","link":"/"},{"text":"Installation","link":"/installation"},{"text":"Getting Started","link":"/getting-started"}]},{"text":"Guide","items":[{"text":"Workflow","link":"/workflow"},{"text":"Vector Search","link":"/vector-search"},{"text":"Claude Code Hooks","link":"/claude-code-hooks"}]},{"text":"Deployment","items":[{"text":"Deploy to Vercel","link":"/deployment"}]}],"search":{"provider":"local"}},"locales":{},"scrollOffset":134,"cleanUrls":false}'));
 const __vite_import_meta_env__ = {};
 const EXTERNAL_URL_RE = /^(?:[a-z]+:|\/\/)/i;
 const APPEARANCE_KEY = "vitepress-theme-appearance";
@@ -3102,7 +3102,7 @@ const _sfc_main$s = /* @__PURE__ */ defineComponent({
   __name: "VPNavBarSearch",
   __ssrInlineRender: true,
   setup(__props) {
-    const VPLocalSearchBox = defineAsyncComponent(() => import("./VPLocalSearchBox.DBu5xu_2.js"));
+    const VPLocalSearchBox = defineAsyncComponent(() => import("./VPLocalSearchBox.DgERtCr4.js"));
     const VPAlgoliaSearchBox = () => null;
     const { theme: theme2 } = useData();
     const loaded = ref(false);
@@ -4836,6 +4836,8 @@ const RawTheme = {
   setup() {
     onMounted(() => {
       console.log("🔧 Eddie theme loaded!");
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("vitepress-theme-appearance", "light");
       const insertDownloadButton = () => {
         if (document.querySelector(".download-button")) return;
         const searchContainer = document.querySelector(".VPNavBarSearch");

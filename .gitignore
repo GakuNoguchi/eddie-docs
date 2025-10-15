@@ -10,3 +10,4 @@ node_modules/
 # Vector search data
 .system/vector-data/
 .vitepress/cache/
+.vercel

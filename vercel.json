@@ -1,0 +1,13 @@
+{
+  "name": "eddie-docs-official",
+  "version": 2,
+  "buildCommand": "npm run build",
+  "outputDirectory": "edit/4.publish📚/.vitepress/dist",
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/$1"
+    }
+  ]
+}

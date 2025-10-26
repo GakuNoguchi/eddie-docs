@@ -69,6 +69,8 @@ npm run search "design principles"
 
 ### Vercel
 
+**⚠️ Important**: This project is configured as `eddie-docs-official` to avoid conflicts with other team deployments.
+
 1. Push to GitHub
 ```bash
 git init
@@ -83,6 +85,10 @@ git push origin main
 npm install -g vercel
 vercel
 ```
+
+**Production URL**: `eddie-docs-official.vercel.app`
+
+**Note**: If deploying under a company Vercel team, check the internal deployment registry first to avoid domain conflicts.
 
 ## Documentation Structure
 

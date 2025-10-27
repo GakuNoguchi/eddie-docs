@@ -8,10 +8,6 @@ export default {
     onMounted(() => {
       console.log('🔧 Eddie theme loaded!')
 
-      // Force light mode (override VitePress dark mode detection)
-      document.documentElement.classList.remove('dark')
-      localStorage.setItem('vitepress-theme-appearance', 'light')
-
       // Insert download button next to search button
       const insertDownloadButton = () => {
         if (document.querySelector('.download-button')) return
@@ -118,11 +114,21 @@ export default {
             const path = window.location.pathname
             console.log('Current path:', path)
 
-            // Convert .html to .md for fetching the source
-            let mdPath = path.replace(/\.html$/, '.md')
-            if (mdPath.endsWith('/')) {
-              mdPath = mdPath + 'index.md'
+            // Convert path to .md file path
+            let mdPath = path
+              .replace(/\.html$/, '')  // Remove .html if present
+              .replace(/\/$/, '')      // Remove trailing / if present
+
+            // Add .md extension if not present
+            if (!mdPath.endsWith('.md')) {
+              mdPath = mdPath + '.md'
             }
+
+            // Handle root path
+            if (mdPath === '.md') {
+              mdPath = '/index.md'
+            }
+
             console.log('Converted mdPath:', mdPath)
             console.log('About to fetch:', mdPath)
 
@@ -191,7 +197,17 @@ export default {
           console.log('Filename:', filename)
 
           try {
-            // Use html2pdf for better Unicode/emoji support
+            // Load marked.js for proper Markdown parsing
+            if (typeof marked === 'undefined') {
+              console.log('⬇️ Loading marked.js library...')
+              await loadScript('https://cdn.jsdelivr.net/npm/marked@16.3.0/lib/marked.umd.js')
+              console.log('✅ marked.js loaded')
+              console.log('marked object:', typeof marked)
+            } else {
+              console.log('✅ marked.js already loaded')
+            }
+
+            // Load html2pdf for PDF generation
             if (!window.html2pdf) {
               console.log('⬇️ Loading html2pdf library...')
               await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js')
@@ -200,26 +216,158 @@ export default {
               console.log('✅ html2pdf already loaded')
             }
 
-            // Convert markdown to HTML (simple conversion)
-            console.log('🔄 Converting markdown to HTML')
-            const htmlContent = markdown
-              .replace(/&/g, '&amp;')
-              .replace(/</g, '&lt;')
-              .replace(/>/g, '&gt;')
-              .replace(/\n\n/g, '<br><br>')
-              .replace(/\n/g, '<br>')
-
+            // Convert markdown to HTML using marked (preserves structure)
+            console.log('🔄 Converting markdown to HTML with marked.js')
+            console.log('Calling marked.parse()...')
+            const htmlContent = marked.parse(markdown)
             console.log('HTML content length:', htmlContent.length)
 
+            // Create styled container
             const element = document.createElement('div')
             element.innerHTML = htmlContent
-            element.style.padding = '20px'
             element.style.fontFamily = 'Arial, sans-serif'
-            element.style.fontSize = '12px'
+            element.style.fontSize = '11pt'
             element.style.lineHeight = '1.6'
+            element.style.color = '#333'
 
-            console.log('🖨️ Generating PDF...')
-            await window.html2pdf().from(element).save(`${filename}.pdf`)
+            // Apply heading styles with page break control
+            const style = document.createElement('style')
+            style.textContent = `
+              @page {
+                margin: 20mm;
+              }
+
+              body {
+                font-size: 11pt;
+                line-height: 1.6;
+              }
+
+              h1 {
+                font-size: 20pt;
+                font-weight: bold;
+                margin-top: 24pt;
+                margin-bottom: 12pt;
+                page-break-before: always;
+                page-break-after: avoid;
+              }
+
+              h1:first-child {
+                page-break-before: avoid;
+              }
+
+              h2 {
+                font-size: 16pt;
+                font-weight: bold;
+                margin-top: 18pt;
+                margin-bottom: 10pt;
+                page-break-after: avoid;
+              }
+
+              h3 {
+                font-size: 13pt;
+                font-weight: bold;
+                margin-top: 14pt;
+                margin-bottom: 8pt;
+                page-break-after: avoid;
+              }
+
+              h4 {
+                font-size: 11pt;
+                font-weight: bold;
+                margin-top: 12pt;
+                margin-bottom: 6pt;
+                page-break-after: avoid;
+              }
+
+              p {
+                margin: 10pt 0;
+                orphans: 3;
+                widows: 3;
+              }
+
+              code {
+                background-color: #f5f5f5;
+                padding: 2pt 4pt;
+                font-family: 'Courier New', monospace;
+                font-size: 10pt;
+              }
+
+              pre {
+                background-color: #f5f5f5;
+                padding: 12pt;
+                border: 1pt solid #ddd;
+                font-family: 'Courier New', monospace;
+                font-size: 9pt;
+                line-height: 1.4;
+                page-break-inside: avoid;
+                overflow-x: auto;
+                white-space: pre-wrap;
+                word-wrap: break-word;
+              }
+
+              blockquote {
+                border-left: 3pt solid #ccc;
+                padding-left: 12pt;
+                margin: 12pt 0;
+                color: #666;
+                font-style: italic;
+                page-break-inside: avoid;
+              }
+
+              ul, ol {
+                margin: 10pt 0;
+                padding-left: 24pt;
+              }
+
+              li {
+                margin: 6pt 0;
+              }
+
+              table {
+                border-collapse: collapse;
+                margin: 12pt 0;
+                page-break-inside: avoid;
+              }
+
+              th, td {
+                border: 1pt solid #ddd;
+                padding: 8pt;
+                text-align: left;
+              }
+
+              th {
+                background-color: #f5f5f5;
+                font-weight: bold;
+              }
+
+              img {
+                max-width: 100%;
+                page-break-inside: avoid;
+              }
+            `
+            element.appendChild(style)
+
+            console.log('🖨️ Generating PDF with proper margins and page breaks...')
+            const pdfOptions = {
+              margin: [20, 20, 20, 20],  // top, right, bottom, left (mm)
+              filename: `${filename}.pdf`,
+              image: { type: 'jpeg', quality: 0.98 },
+              html2canvas: {
+                scale: 2,
+                useCORS: true,
+                letterRendering: true
+              },
+              jsPDF: {
+                unit: 'mm',
+                format: 'a4',
+                orientation: 'portrait'
+              },
+              pagebreak: {
+                mode: 'css'  // Use CSS page-break properties only (avoid-all causes blank pages)
+              }
+            }
+
+            await window.html2pdf().set(pdfOptions).from(element).save()
             console.log('✅ PDF saved:', `${filename}.pdf`)
           } catch (error) {
             console.error('❌ PDF generation failed:', error)
@@ -235,6 +383,16 @@ export default {
           console.log('Filename:', filename)
 
           try {
+            // Load marked.js for proper Markdown parsing
+            if (typeof marked === 'undefined') {
+              console.log('⬇️ Loading marked.js library...')
+              await loadScript('https://cdn.jsdelivr.net/npm/marked@16.3.0/lib/marked.umd.js')
+              console.log('✅ marked.js loaded')
+              console.log('marked object:', typeof marked)
+            } else {
+              console.log('✅ marked.js already loaded')
+            }
+
             // Load html-docx-js from CDN (simpler, browser-friendly)
             if (!window.htmlDocx) {
               console.log('⬇️ Loading html-docx-js library...')
@@ -244,8 +402,14 @@ export default {
               console.log('✅ html-docx-js already loaded')
             }
 
-            // Convert markdown to HTML (simple conversion)
-            console.log('🔄 Converting markdown to HTML')
+            // Convert markdown to HTML using marked (preserves heading structure)
+            console.log('🔄 Converting markdown to HTML with marked.js')
+            console.log('Calling marked.parse()...')
+            const bodyContent = marked.parse(markdown)
+            console.log('Parsed HTML length:', bodyContent.length)
+
+            // Create full HTML document with styles for Word
+            // html-docx-js will convert <h1> to Word "Heading 1" style, <h2> to "Heading 2", etc.
             const htmlContent = `
 <!DOCTYPE html>
 <html>
@@ -253,24 +417,33 @@ export default {
   <meta charset="UTF-8">
   <style>
     body { font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.6; }
-    h1 { font-size: 18pt; font-weight: bold; margin-top: 20pt; }
-    h2 { font-size: 14pt; font-weight: bold; margin-top: 15pt; }
+    h1 { font-size: 20pt; font-weight: bold; margin-top: 24pt; margin-bottom: 12pt; }
+    h2 { font-size: 16pt; font-weight: bold; margin-top: 18pt; margin-bottom: 10pt; }
+    h3 { font-size: 14pt; font-weight: bold; margin-top: 14pt; margin-bottom: 8pt; }
+    h4 { font-size: 12pt; font-weight: bold; margin-top: 12pt; margin-bottom: 6pt; }
     p { margin: 10pt 0; }
+    code { background-color: #f4f4f4; padding: 2pt 4pt; font-family: Consolas, monospace; }
+    pre { background-color: #f4f4f4; padding: 10pt; border: 1pt solid #ddd; font-family: Consolas, monospace; }
+    blockquote { border-left: 4pt solid #ddd; padding-left: 12pt; margin: 10pt 0; color: #666; }
+    ul, ol { margin: 10pt 0; padding-left: 24pt; }
+    li { margin: 6pt 0; }
+    table { border-collapse: collapse; margin: 10pt 0; }
+    th, td { border: 1pt solid #ddd; padding: 8pt; }
   </style>
 </head>
 <body>
-  <pre style="white-space: pre-wrap; font-family: Arial;">${markdown.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>
+${bodyContent}
 </body>
 </html>
 `
-            console.log('HTML content length:', htmlContent.length)
+            console.log('Full HTML document length:', htmlContent.length)
 
-            console.log('📝 Converting HTML to Word document')
+            console.log('📝 Converting HTML to Word document (h1→見出し1, h2→見出し2)')
             const converted = window.htmlDocx.asBlob(htmlContent)
             console.log('Word blob size:', converted.size)
 
             downloadFile(converted, `${filename}.docx`)
-            console.log('✅ Word saved:', `${filename}.docx`)
+            console.log('✅ Word saved with structured headings:', `${filename}.docx`)
           } catch (error) {
             console.error('❌ Word generation failed:', error)
             console.error('Error stack:', error.stack)

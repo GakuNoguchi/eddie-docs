@@ -17,7 +17,7 @@ export default defineConfig({
   title: 'eddie-docs',
   description: 'Documentation powered by Eddie',
 
-  appearance: false, // Disable dark mode completely
+  appearance: 'light', // Force light mode
   ignoreDeadLinks: true,
 
   markdown: {
@@ -131,7 +131,7 @@ export default defineConfig({
   buildEnd: async (siteConfig) => {
     console.log('🔧 buildEnd hook: Copying Markdown files to dist...')
 
-    // Get the source directory (edit/4.publish📚)
+    // Get the source directory
     const srcDir = path.resolve(__dirname, '../../edit/4.publish📚')
     const outDir = siteConfig.outDir
 

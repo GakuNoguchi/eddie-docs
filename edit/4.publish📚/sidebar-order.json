@@ -12,8 +12,7 @@
       "text": "Guide",
       "items": [
         { "file": "workflow", "text": "Workflow" },
-        { "file": "vector-search", "text": "Vector Search" },
-        { "file": "claude-code-hooks", "text": "Claude Code Hooks" }
+        { "file": "vector-search", "text": "Vector Search" }
       ]
     },
     {

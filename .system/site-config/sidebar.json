@@ -26,10 +26,6 @@
       {
         "text": "Vector Search",
         "link": "/vector-search"
-      },
-      {
-        "text": "Claude Code Hooks",
-        "link": "/claude-code-hooks"
       }
     ]
   },

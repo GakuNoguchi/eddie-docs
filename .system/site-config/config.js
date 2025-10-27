@@ -14,7 +14,7 @@ if (fs.existsSync(sidebarPath)) {
 }
 
 export default defineConfig({
-  title: 'eddie-docs',
+  title: 'Eddie',
   description: 'Documentation powered by Eddie',
 
   appearance: 'light', // Force light mode

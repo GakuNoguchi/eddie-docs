@@ -1,0 +1,25 @@
+{
+  "groups": [
+    {
+      "text": "はじめに",
+      "items": [
+        { "file": "index", "text": "イントロダクション" },
+        { "file": "installation", "text": "インストール" },
+        { "file": "getting-started", "text": "はじめに" }
+      ]
+    },
+    {
+      "text": "ガイド",
+      "items": [
+        { "file": "workflow", "text": "ワークフロー" },
+        { "file": "vector-search", "text": "ベクトル検索" }
+      ]
+    },
+    {
+      "text": "デプロイ",
+      "items": [
+        { "file": "deployment", "text": "Vercelにデプロイ" }
+      ]
+    }
+  ]
+}

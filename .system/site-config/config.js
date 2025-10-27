@@ -13,12 +13,60 @@ if (fs.existsSync(sidebarPath)) {
   sidebar = JSON.parse(fs.readFileSync(sidebarPath, 'utf-8'))
 }
 
+// Load Japanese sidebar
+let sidebarJa = 'auto'
+const sidebarJaPath = path.join(__dirname, 'sidebar-ja.json')
+if (fs.existsSync(sidebarJaPath)) {
+  sidebarJa = JSON.parse(fs.readFileSync(sidebarJaPath, 'utf-8'))
+}
+
 export default defineConfig({
   title: 'Eddie',
   description: 'Documentation powered by Eddie',
 
   appearance: 'light', // Force light mode
   ignoreDeadLinks: true,
+
+  // Multi-language support
+  locales: {
+    root: {
+      label: 'English',
+      lang: 'en',
+      themeConfig: {
+        sidebar,
+        search: {
+          provider: 'local'
+        }
+      }
+    },
+    ja: {
+      label: '日本語',
+      lang: 'ja',
+      themeConfig: {
+        sidebar: sidebarJa,
+        search: {
+          provider: 'local',
+          options: {
+            translations: {
+              button: {
+                buttonText: '検索',
+                buttonAriaLabel: '検索'
+              },
+              modal: {
+                noResultsText: '結果が見つかりません',
+                resetButtonTitle: 'リセット',
+                footer: {
+                  selectText: '選択',
+                  navigateText: '移動',
+                  closeText: '閉じる'
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
 
   markdown: {
     // Pre-process markdown to convert Obsidian hybrid links
@@ -110,14 +158,6 @@ export default defineConfig({
         state.pos = end + 2
         return true
       })
-    }
-  },
-
-  themeConfig: {
-    sidebar,
-
-    search: {
-      provider: 'local'
     }
   },
 

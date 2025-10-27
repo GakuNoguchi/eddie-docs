@@ -1,0 +1,41 @@
+[
+  {
+    "text": "はじめに",
+    "items": [
+      {
+        "text": "イントロダクション",
+        "link": "/ja/"
+      },
+      {
+        "text": "インストール",
+        "link": "/ja/installation"
+      },
+      {
+        "text": "はじめに",
+        "link": "/ja/getting-started"
+      }
+    ]
+  },
+  {
+    "text": "ガイド",
+    "items": [
+      {
+        "text": "ワークフロー",
+        "link": "/ja/workflow"
+      },
+      {
+        "text": "ベクトル検索",
+        "link": "/ja/vector-search"
+      }
+    ]
+  },
+  {
+    "text": "デプロイ",
+    "items": [
+      {
+        "text": "Vercelにデプロイ",
+        "link": "/ja/deployment"
+      }
+    ]
+  }
+]

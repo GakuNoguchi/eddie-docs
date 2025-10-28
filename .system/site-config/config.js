@@ -31,22 +31,25 @@ export default defineConfig({
   locales: {
     root: {
       label: 'English',
-      lang: 'en',
-      themeConfig: {
-        sidebar,
-        search: {
-          provider: 'local'
-        }
-      }
+      lang: 'en'
     },
     ja: {
       label: '日本語',
-      lang: 'ja',
-      themeConfig: {
-        sidebar: sidebarJa,
-        search: {
-          provider: 'local',
-          options: {
+      lang: 'ja'
+    }
+  },
+
+  themeConfig: {
+    sidebar: {
+      '/': sidebar,
+      '/ja/': sidebarJa
+    },
+
+    search: {
+      provider: 'local',
+      options: {
+        locales: {
+          ja: {
             translations: {
               button: {
                 buttonText: '検索',
